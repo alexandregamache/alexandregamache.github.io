@@ -5,49 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vas-y Slaf, on t'aime &lt;3</title>
 <style>
-:root{--ink:#17213a;--paper:#fbf9f4;--red:#c62845;--blue:#2864b4;--gold:#d49a24}
+:root{--red:#AF1E2D;--blue:#192168;--ice:#f4f8ff;--white:#fff;--sky:#7fa6e8}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:linear-gradient(145deg,#fff0ef 0%,#fbf9f4 48%,#eaf1fc 100%);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
-main{max-width:1050px;margin:auto;padding:28px 16px 36px}
-h1{text-align:center;font-size:clamp(2.1rem,6vw,4.3rem);line-height:1.02;letter-spacing:-.055em;margin:10px 0 26px;font-weight:900}
-h1 span{color:var(--red);white-space:nowrap}
-figure{margin:0;background:#fffefa;border:1px solid #ece7de;border-radius:22px;padding:clamp(10px,2.5vw,22px);box-shadow:0 12px 32px #24324a12}
-svg{width:100%;height:auto;display:block;overflow:visible}
-.gridline{stroke:#ece9e2;stroke-width:1}
-.axis{stroke:#aeb5c2;stroke-width:1.2}
-.tick{fill:#778197;font-size:12px}
-.axislabel{fill:#778197;font-size:12px;font-weight:600}
-.curve{fill:none;stroke-width:3.7;stroke-linecap:round;stroke-linejoin:round}
-.endlabel{font-size:14px;font-weight:800}
-.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:24px;padding:14px 4px 2px}
-.legend span{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:750}
-.swatch{width:23px;height:4px;border-radius:4px;display:inline-block}
-#message{min-height:1.2em;text-align:center;color:#6b7488;font-size:.8rem;margin:8px 0 0}
-#message.err{color:#8a5260}
-#tools{text-align:center;margin-top:6px}
-#tools button{font:inherit;font-size:.72rem;color:#778197;background:none;border:1px solid #d9d5cc;border-radius:99px;padding:4px 12px}
-#export{display:none;width:100%;height:90px;margin-top:8px;font:11px/1.3 monospace;border:1px solid #d9d5cc;border-radius:10px;padding:8px}
-@media(max-width:560px){main{padding:18px 8px}.legend{gap:13px}.legend span{font-size:.78rem}}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;color:var(--blue);font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;overflow-x:hidden;
+ background:
+  radial-gradient(circle at 12% 18%,#ffffff 0 120px,transparent 121px),
+  radial-gradient(circle at 88% 70%,#ffffff 0 160px,transparent 161px),
+  linear-gradient(180deg,#e9f1ff 0%,#f7faff 40%,#eaf1ff 100%)}
+/* lignes de patinoire */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+ background:linear-gradient(90deg,transparent calc(50% - 3px),#af1e2d14 calc(50% - 3px) calc(50% + 3px),transparent calc(50% + 3px)),
+            linear-gradient(90deg,transparent calc(22% - 2px),#19216812 calc(22% - 2px) calc(22% + 2px),transparent calc(22% + 2px)),
+            linear-gradient(90deg,transparent calc(78% - 2px),#19216812 calc(78% - 2px) calc(78% + 2px),transparent calc(78% + 2px))}
+.float{position:fixed;font-size:2rem;opacity:.5;z-index:0;pointer-events:none;animation:drift 9s ease-in-out infinite}
+.float:nth-child(1){left:4%;top:18%}.float:nth-child(2){right:5%;top:30%;animation-delay:-2s}
+.float:nth-child(3){left:7%;top:68%;animation-delay:-4s}.float:nth-child(4){right:8%;top:82%;animation-delay:-6s}
+@keyframes drift{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-18px) rotate(10deg)}}
+main{position:relative;z-index:1;max-width:1050px;margin:auto;padding:0 14px 40px}
+
+/* bandeau maillot */
+.banner{margin:0 -14px 0;background:var(--red);color:#fff;text-align:center;padding:26px 12px 18px;position:relative;
+ border-bottom:10px solid #fff;box-shadow:0 10px 0 var(--blue),0 22px 30px #19216822}
+.banner h1{margin:0;font-family:Impact,"Arial Black",system-ui,sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;
+ font-size:clamp(2.6rem,10vw,5.6rem);line-height:.95;letter-spacing:.01em;text-shadow:4px 4px 0 var(--blue)}
+.sticker{display:inline-block;margin-top:14px;background:#fff;color:var(--red);font-weight:900;font-size:clamp(1.1rem,4vw,1.8rem);
+ padding:6px 18px;border-radius:99px;border:4px solid var(--blue);transform:rotate(-3deg);box-shadow:4px 4px 0 var(--blue);animation:wiggle 3s ease-in-out infinite}
+.heart{display:inline-block;animation:beat 1.1s infinite}
+@keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(2deg) scale(1.04)}}
+@keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.35)}}
+
+/* cartes de stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:36px 0 22px}
+.card{background:#fff;border:3px solid var(--blue);border-radius:18px;padding:12px 8px 10px;text-align:center;box-shadow:0 5px 0 var(--blue);position:relative}
+.card .big{font-family:Impact,"Arial Black",sans-serif;font-size:clamp(1.9rem,7vw,3rem);line-height:1;color:var(--red)}
+.card .lbl{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+.card.hot{background:var(--red);color:#fff;border-color:var(--blue)}
+.card.hot .big{color:#fff;text-shadow:3px 3px 0 var(--blue)}
+.light{position:absolute;top:6px;right:8px;width:14px;height:14px;border-radius:50%;background:#ff3b4d;box-shadow:0 0 0 3px #fff,0 0 14px 4px #ff3b4d;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25;box-shadow:0 0 0 3px #fff}}
+@media(max-width:620px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* graphique */
+figure.chart{margin:0;background:#fff;border:4px solid var(--blue);border-radius:26px;padding:clamp(8px,2vw,18px);box-shadow:0 8px 0 var(--red),0 20px 36px #19216822}
+svg{width:100%;height:auto;display:block;overflow:visible;touch-action:pan-y;cursor:crosshair}
+.gridline{stroke:#dfe7f7;stroke-width:1.2}
+.axis{stroke:var(--blue);stroke-width:2}
+.tick{fill:#4b5688;font-size:15px;font-weight:700}
+.axislabel{fill:var(--blue);font-size:15px;font-weight:900}
+.curve{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.curve.anim{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.endlabel{font-family:Impact,"Arial Black",sans-serif;font-size:24px;fill:var(--red);paint-order:stroke;stroke:#fff;stroke-width:5px}
+.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:12px 0 4px}
+.legend span{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:900;background:var(--ice);border:2px solid var(--blue);border-radius:99px;padding:4px 14px 4px 10px}
+.swatch{width:26px;height:8px;border-radius:6px;display:inline-block}
+#readout{margin:6px auto 2px;text-align:center;font-weight:900;font-size:.95rem;background:var(--blue);color:#fff;border-radius:14px;padding:9px 12px;min-height:2.6em;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 14px}
+#readout b{color:#ffd6da}
+#message{min-height:1.2em;text-align:center;color:var(--red);font-size:.8rem;font-weight:700;margin:8px 0 0}
+#message.ok{color:#4b5688}
+.btnrow{text-align:center;margin-top:20px}
+.goal{font:inherit;font-family:Impact,"Arial Black",sans-serif;font-size:1.4rem;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--red);border:4px solid var(--blue);border-radius:99px;padding:10px 30px;box-shadow:0 6px 0 var(--blue);cursor:pointer}
+.goal:active{transform:translateY(5px);box-shadow:0 1px 0 var(--blue)}
+.burst{position:fixed;font-size:2rem;pointer-events:none;z-index:50;animation:fly 1.4s ease-out forwards}
+@keyframes fly{from{transform:translate(0,0) scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(1.4);opacity:0}}
+footer{text-align:center;font-size:.75rem;margin-top:22px;color:#4b5688;font-weight:700}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.curve.anim{stroke-dasharray:none;stroke-dashoffset:0}}
 </style>
 </head>
 <body>
+<span class="float">🏒</span><span class="float">❤️</span><span class="float">🥅</span><span class="float">🧊</span>
 <main>
-<h1>Vas-y Slaf,<br><span>on t'aime &lt;3</span></h1>
-<figure>
-<svg id="chart" viewBox="0 0 960 500" role="img" aria-label="Points cumulés de Juraj Slafkovský par numéro de match, sur trois saisons"></svg>
-<div class="legend">
-<span><i class="swatch" style="background:#d49a24"></i>2024–2025</span>
-<span><i class="swatch" style="background:#2864b4"></i>2025–2026</span>
-<span><i class="swatch" style="background:#c62845"></i>2026–2027</span>
-</div>
-<div id="message">Chargement…</div>
-<div id="tools"><button id="exportBtn" hidden>Exporter les saisons passées</button><textarea id="export" readonly></textarea></div>
+<header class="banner">
+  <h1>Vas-y Slaf</h1>
+  <div class="sticker">on t'aime <span class="heart">&lt;3</span></div>
+</header>
+
+<section class="stats" id="stats"></section>
+
+<figure class="chart">
+  <svg id="chart" viewBox="0 0 960 560" role="img" aria-label="Points cumulés de Juraj Slafkovský par numéro de match, sur trois saisons"></svg>
+  <div id="readout">👆 Touche ou glisse sur le graphique !</div>
+  <div class="legend">
+    <span><i class="swatch" style="background:#7fa6e8"></i>2024–2025</span>
+    <span><i class="swatch" style="background:#192168"></i>2025–2026</span>
+    <span><i class="swatch" style="background:#AF1E2D"></i>2026–2027</span>
+  </div>
+  <div id="message" class="ok">Chargement…</div>
 </figure>
+
+<div class="btnrow"><button class="goal" id="goalBtn">🚨 BUUUT !</button></div>
+<footer>Fait avec ❤️ pour Slaf — Go Habs Go !</footer>
 </main>
 <script>
 /* ============================================================
-   DONNÉES
-   Chaque tableau = points CUMULÉS après le match 1, 2, 3, …
+   DONNÉES  (points CUMULÉS après le match 1, 2, 3, …)
    ============================================================ */
 const PLAYER_ID = 8483515;
 
@@ -57,31 +109,29 @@ const HARDCODED = {
   "2025-26": [0, 1, 1, 1, 1, 2, 3, 3, 3, 5, 6, 7, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 12, 13, 14, 15, 16, 16, 16, 18, 18, 20, 20, 20, 21, 23, 25, 28, 28, 30, 30, 32, 33, 35, 35, 38, 38, 38, 40, 40, 40, 41, 41, 43, 44, 44, 45, 46, 46, 47, 49, 52, 52, 53, 54, 55, 56, 57, 61, 63, 63, 63, 64, 66, 67, 67, 67, 69, 71, 72, 73, 73]
 };
 
-/* Instantané de la saison en cours (source : ESPN, 26 matchs, 14 pts,
-   jusqu'au 26 nov. 2026). Sert d'affichage de secours si l'API est
-   inaccessible ; remplacé dès qu'une mise à jour réussit. */
+/* Instantané de secours de la saison en cours (ESPN, 26 matchs, 14 pts, 26 nov. 2026). */
 const SNAPSHOT_CURRENT = (function(){
   const perGame=[0,0,1,0,0,2,0,2,2,0,1,0,1,0,2,1,0,0,0,1,0,1,0,0,0,0];
   let t=0;return perGame.map(p=>t+=p);
 })();
 
 const SEASONS = [
-  {label:"2024–2025", id:"2024-25", year:20242025, color:"#d49a24", current:false},
-  {label:"2025–2026", id:"2025-26", year:20252026, color:"#2864b4", current:false},
-  {label:"2026–2027", id:"2026-27", year:20262027, color:"#c62845", current:true}
+  {label:"2024–2025", id:"2024-25", year:20242025, color:"#7fa6e8", width:4,   current:false},
+  {label:"2025–2026", id:"2025-26", year:20252026, color:"#192168", width:4,   current:false},
+  {label:"2026–2027", id:"2026-27", year:20262027, color:"#AF1E2D", width:6,   current:true}
 ];
+const CUR=SEASONS[2];
 
 /* ============================================================ */
 const NS="http://www.w3.org/2000/svg";
-const data={};      // id -> points cumulés par match
-const status={};    // id -> "live" | "cache" | "snapshot" | "hardcoded" | "fail"
+const data={}, status={};
+let curN=null, animOK=true;
+setTimeout(()=>animOK=false,2500);
 function node(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);parent.appendChild(n);return n}
 
-/* ---------- stockage local (protégé : peut être indisponible) ---------- */
 function cacheGet(id){try{const v=JSON.parse(localStorage.getItem("slaf:"+id));return Array.isArray(v&&v.pts)?v.pts:null}catch(_){return null}}
 function cacheSet(id,pts){try{localStorage.setItem("slaf:"+id,JSON.stringify({pts:pts,t:Date.now()}))}catch(_){}}
 
-/* ---------- réseau avec délai maximal (évite le blocage silencieux) ---------- */
 function fetchJson(url,ms){
   const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
   return fetch(url,{signal:c.signal,cache:"no-store"})
@@ -89,17 +139,11 @@ function fetchJson(url,ms){
     .finally(()=>clearTimeout(t));
 }
 function getJson(url){
-  const urls=[
-    url,
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(url),
-    "https://corsproxy.io/?"+encodeURIComponent(url)
-  ];
+  const urls=[url,"https://api.allorigins.win/raw?url="+encodeURIComponent(url),"https://corsproxy.io/?"+encodeURIComponent(url)];
   const tries=urls.map(u=>fetchJson(u,10000));
   if(Promise.any)return Promise.any(tries);
   return new Promise((ok,ko)=>{let n=0;tries.forEach(p=>p.then(ok,()=>{if(++n===tries.length)ko(new Error("Chargement impossible"))}))});
 }
-
-/* ---------- lecture du journal de matchs ---------- */
 async function loadSeason(s){
   // Saison en cours : d'abord current.json (même site, mis à jour par GitHub Actions)
   if(s.current){
@@ -120,85 +164,124 @@ async function loadSeason(s){
   });
 }
 
-/* ---------- dessin ---------- */
+/* ---------- géométrie du graphique ---------- */
+const W=960,H=560,L=70,R=46,T=26,B=70,pw=W-L-R,ph=H-T-B;
+let ymax=10;
+const X=n=>L+n/82*pw, Y=n=>T+ph-n/ymax*ph;
+
 function draw(){
   const svg=document.getElementById("chart");svg.innerHTML="";
-  const W=960,H=500,L=68,R=44,T=24,B=58,pw=W-L-R,ph=H-T-B;
   const all=[].concat(...Object.values(data));
   const max=Math.max(10,...all);
-  const step=max<=50?5:10,ymax=Math.ceil(max/step)*step;
-  const x=n=>L+n/82*pw,y=n=>T+ph-n/ymax*ph;
+  const step=max<=50?5:10;ymax=Math.ceil(max/step)*step;
   for(let v=0;v<=ymax;v+=step){
-    const yy=y(v);node("line",{x1:L,y1:yy,x2:W-R,y2:yy,class:"gridline"},svg);
-    const t=node("text",{x:L-12,y:yy+4,"text-anchor":"end",class:"tick"},svg);t.textContent=v;
+    const yy=Y(v);node("line",{x1:L,y1:yy,x2:W-R,y2:yy,class:"gridline"},svg);
+    const t=node("text",{x:L-12,y:yy+5,"text-anchor":"end",class:"tick"},svg);t.textContent=v;
   }
   for(let v=0;v<=80;v+=10){
-    const xx=x(v);node("line",{x1:xx,y1:T,x2:xx,y2:T+ph,class:"gridline"},svg);
-    const t=node("text",{x:xx,y:H-B+22,"text-anchor":"middle",class:"tick"},svg);t.textContent=v;
+    const xx=X(v);node("line",{x1:xx,y1:T,x2:xx,y2:T+ph,class:"gridline"},svg);
+    const t=node("text",{x:xx,y:T+ph+26,"text-anchor":"middle",class:"tick"},svg);t.textContent=v;
   }
   node("line",{x1:L,y1:T+ph,x2:W-R,y2:T+ph,class:"axis"},svg);
   node("line",{x1:L,y1:T,x2:L,y2:T+ph,class:"axis"},svg);
-  const xl=node("text",{x:L+pw/2,y:H-8,"text-anchor":"middle",class:"axislabel"},svg);xl.textContent="Numéro du match";
-  const yl=node("text",{x:16,y:T+ph/2,"text-anchor":"middle",class:"axislabel",transform:`rotate(-90 16 ${T+ph/2})`},svg);yl.textContent="Points";
+  const xl=node("text",{x:L+pw/2,y:H-14,"text-anchor":"middle",class:"axislabel"},svg);xl.textContent="Numéro du match";
+  const yl=node("text",{x:18,y:T+ph/2,"text-anchor":"middle",class:"axislabel",transform:`rotate(-90 18 ${T+ph/2})`},svg);yl.textContent="Points";
   SEASONS.forEach(s=>{
     const d=data[s.id];if(!d||!d.length)return;
     const pts=[0].concat(d);
-    const path=pts.map((p,i)=>(i?"L":"M")+x(i).toFixed(1)+","+y(p).toFixed(1)).join(" ");
-    node("path",{d:path,class:"curve",stroke:s.color},svg);
+    const path=pts.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+","+Y(p).toFixed(1)).join(" ");
+    node("path",{d:path,class:"curve"+(animOK?" anim":""),stroke:s.color,"stroke-width":s.width,pathLength:1},svg);
     if(s.current){
-      const n=pts.length-1,cx=x(n),cy=y(pts[n]);
-      node("circle",{cx:cx,cy:cy,r:5.5,fill:s.color,stroke:"#fff","stroke-width":2},svg);
-      const t=node("text",{x:cx+9,y:cy+5,class:"endlabel",fill:s.color},svg);t.textContent=pts[n];
+      const n=pts.length-1,cx=X(n),cy=Y(pts[n]);
+      node("circle",{cx:cx,cy:cy,r:9,fill:s.color,stroke:"#fff","stroke-width":3},svg);
+      const t=node("text",{x:cx+14,y:cy+8,class:"endlabel"},svg);t.textContent=pts[n];
     }
   });
+  drawCursor();
+}
+
+/* ---------- curseur interactif ---------- */
+function drawCursor(){
+  const svg=document.getElementById("chart"),ro=document.getElementById("readout");
+  if(curN===null)return;
+  node("line",{x1:X(curN),y1:T,x2:X(curN),y2:T+ph,stroke:"#AF1E2D","stroke-width":2,"stroke-dasharray":"6 6"},svg);
+  const parts=[`🏒 Match <b>${curN}</b>`];
+  SEASONS.slice().reverse().forEach(s=>{
+    const d=data[s.id];if(!d||!d.length)return;
+    const v=curN===0?0:d[curN-1];
+    if(v===undefined)return;
+    node("circle",{cx:X(curN),cy:Y(v),r:7,fill:s.color,stroke:"#fff","stroke-width":3},svg);
+    parts.push(`${s.label.replace("–","-")} : <b>${v}</b>`);
+  });
+  ro.innerHTML=parts.join(" · ");
+}
+(function(){
+  const svg=document.getElementById("chart");
+  function move(e){
+    const r=svg.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width*W;
+    curN=Math.max(0,Math.min(82,Math.round((px-L)/pw*82)));
+    draw();
+  }
+  svg.addEventListener("pointerdown",move);
+  svg.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||e.buttons)move(e)});
+})();
+
+/* ---------- cartes de stats ---------- */
+function renderStats(){
+  const d=data[CUR.id],prev=data["2025-26"],box=document.getElementById("stats");
+  if(!d||!d.length){box.innerHTML="";return}
+  const n=d.length,pts=d[n-1],pace=Math.round(pts/n*82);
+  const prevAt=prev&&prev[Math.min(n,prev.length)-1],diff=prevAt===undefined?null:pts-prevAt;
+  const vs=diff===null?"–":(diff>0?"+"+diff:diff);
+  const vsLbl=diff===null?"vs l'an passé":(diff>=0?"d'avance sur 2025-26":"de retard sur 2025-26");
+  box.innerHTML=
+   `<div class="card hot"><i class="light"></i><div class="big">${pts}</div><div class="lbl">points cette saison</div></div>
+    <div class="card"><div class="big">${n}</div><div class="lbl">matchs joués</div></div>
+    <div class="card"><div class="big">${pace}</div><div class="lbl">rythme sur 82 matchs</div></div>
+    <div class="card"><div class="big">${vs}</div><div class="lbl">${vsLbl} (même match)</div></div>`;
 }
 
 /* ---------- message d'état ---------- */
 function updateMessage(){
   const el=document.getElementById("message");
-  const cur=SEASONS.find(s=>s.current),d=data[cur.id];
-  const parts=[];
-  if(d&&d.length)parts.push(`${cur.label} : ${d[d.length-1]} pts en ${d.length} match${d.length>1?"s":""}`);
   const failed=SEASONS.filter(s=>status[s.id]==="fail");
-  const snap=status[cur.id]==="snapshot";
   let warn="";
-  if(failed.length)warn=`Données indisponibles : ${failed.map(s=>s.label).join(", ")}. Vérifie ta connexion et recharge la page.`;
-  else if(snap)warn="Mise à jour en direct impossible : instantané du 26 nov. affiché.";
-  el.className=warn?"err":"";
-  el.textContent=[parts.join(""),warn].filter(Boolean).join(" — ")||"Chargement…";
-  const past=SEASONS.filter(s=>!s.current);
-  const btn=document.getElementById("exportBtn");
-  btn.hidden=!past.every(s=>data[s.id]&&data[s.id].length&&!HARDCODED[s.id]);
+  if(failed.length)warn=`Données indisponibles : ${failed.map(s=>s.label).join(", ")}.`;
+  else if(status[CUR.id]==="snapshot")warn="Mise à jour en direct impossible : instantané du 26 nov. affiché.";
+  el.className=warn?"":"ok";
+  el.textContent=warn||(status[CUR.id]==="live"?"Données à jour ✅":"");
 }
 
-/* ---------- export (pour figer les saisons passées dans le fichier) ---------- */
-document.getElementById("exportBtn").addEventListener("click",()=>{
-  const out={};SEASONS.filter(s=>!s.current).forEach(s=>out[s.id]=data[s.id]);
-  const ta=document.getElementById("export");
-  ta.value=JSON.stringify(out);ta.style.display="block";ta.focus();ta.select();
+/* ---------- BUUUT ! ---------- */
+document.getElementById("goalBtn").addEventListener("click",e=>{
+  const r=e.currentTarget.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const em=["❤️","🏒","🚨","🥅","🎉","🔥","🧊"];
+  for(let i=0;i<22;i++){
+    const b=document.createElement("span");b.className="burst";b.textContent=em[i%em.length];
+    b.style.left=cx+"px";b.style.top=cy+"px";
+    const a=Math.random()*Math.PI*2,d=90+Math.random()*180;
+    b.style.setProperty("--dx",Math.cos(a)*d+"px");b.style.setProperty("--dy",(Math.sin(a)*d-80)+"px");
+    b.style.setProperty("--r",(Math.random()*360-180)+"deg");
+    document.body.appendChild(b);setTimeout(()=>b.remove(),1500);
+  }
 });
 
-/* ---------- démarrage : on dessine TOUT DE SUITE, puis on complète ---------- */
+/* ---------- démarrage ---------- */
+function refresh(){draw();renderStats();updateMessage()}
 (function(){
-  draw();updateMessage();
   SEASONS.forEach(s=>{
-    // 1) codé en dur
     if(!s.current&&Array.isArray(HARDCODED[s.id])){data[s.id]=HARDCODED[s.id];status[s.id]="hardcoded";return}
-    // 2) mémoire locale
     const c=cacheGet(s.id);
     if(c&&c.length){data[s.id]=c;status[s.id]="cache"}
     else if(s.current){data[s.id]=SNAPSHOT_CURRENT;status[s.id]="snapshot"}
-    // saison passée déjà en mémoire : aucun besoin de réseau
     if(!s.current&&status[s.id]==="cache")return;
-    // 3) réseau (saison en cours : toujours ; saison passée : une seule fois)
     loadSeason(s).then(pts=>{
-      if(!pts.length&&s.current)return;       // saison pas commencée : on garde l'existant
+      if(!pts.length&&s.current)return;
       data[s.id]=pts;status[s.id]="live";cacheSet(s.id,pts);
-    }).catch(()=>{
-      if(!data[s.id])status[s.id]="fail";
-    }).finally(()=>{draw();updateMessage()});
+    }).catch(()=>{if(!data[s.id])status[s.id]="fail"}).finally(refresh);
   });
-  draw();updateMessage();
+  refresh();
 })();
 </script>
 </body>
