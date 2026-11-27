@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vas-y Slaf, on t'aime &lt;3</title>
+<style>
+:root{--ink:#17213a;--paper:#fbf9f4;--red:#c62845;--blue:#2864b4;--gold:#d49a24}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(145deg,#fff0ef 0%,#fbf9f4 48%,#eaf1fc 100%);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+main{max-width:1050px;margin:auto;padding:28px 16px 36px}
+h1{text-align:center;font-size:clamp(2.1rem,6vw,4.3rem);line-height:1.02;letter-spacing:-.055em;margin:10px 0 26px;font-weight:900}
+h1 span{color:var(--red);white-space:nowrap}
+figure{margin:0;background:#fffefa;border:1px solid #ece7de;border-radius:22px;padding:clamp(10px,2.5vw,22px);box-shadow:0 12px 32px #24324a12}
+svg{width:100%;height:auto;display:block;overflow:visible}
+.gridline{stroke:#ece9e2;stroke-width:1}
+.axis{stroke:#aeb5c2;stroke-width:1.2}
+.tick{fill:#778197;font-size:12px}
+.axislabel{fill:#778197;font-size:12px;font-weight:600}
+.curve{fill:none;stroke-width:3.7;stroke-linecap:round;stroke-linejoin:round}
+.endlabel{font-size:14px;font-weight:800}
+.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:24px;padding:14px 4px 2px}
+.legend span{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:750}
+.swatch{width:23px;height:4px;border-radius:4px;display:inline-block}
+#message{min-height:1.2em;text-align:center;color:#6b7488;font-size:.8rem;margin:8px 0 0}
+#message.err{color:#8a5260}
+#tools{text-align:center;margin-top:6px}
+#tools button{font:inherit;font-size:.72rem;color:#778197;background:none;border:1px solid #d9d5cc;border-radius:99px;padding:4px 12px}
+#export{display:none;width:100%;height:90px;margin-top:8px;font:11px/1.3 monospace;border:1px solid #d9d5cc;border-radius:10px;padding:8px}
+@media(max-width:560px){main{padding:18px 8px}.legend{gap:13px}.legend span{font-size:.78rem}}
+</style>
+</head>
+<body>
+<main>
+<h1>Vas-y Slaf,<br><span>on t'aime &lt;3</span></h1>
+<figure>
+<svg id="chart" viewBox="0 0 960 500" role="img" aria-label="Points cumulés de Juraj Slafkovský par numéro de match, sur trois saisons"></svg>
+<div class="legend">
+<span><i class="swatch" style="background:#d49a24"></i>2024–2025</span>
+<span><i class="swatch" style="background:#2864b4"></i>2025–2026</span>
+<span><i class="swatch" style="background:#c62845"></i>2026–2027</span>
+</div>
+<div id="message">Chargement…</div>
+<div id="tools"><button id="exportBtn" hidden>Exporter les saisons passées</button><textarea id="export" readonly></textarea></div>
+</figure>
+</main>
+<script>
+/* ============================================================
+   DONNÉES
+   Chaque tableau = points CUMULÉS après le match 1, 2, 3, …
+   ============================================================ */
+const PLAYER_ID = 8483515;
+
+/* Saisons passées codées en dur (source : canadiens.com, saison régulière). */
+const HARDCODED = {
+  "2024-25": [1, 1, 3, 4, 4, 6, 7, 7, 8, 8, 8, 8, 11, 11, 11, 11, 11, 11, 13, 14, 14, 14, 14, 14, 15, 15, 15, 17, 17, 18, 19, 20, 20, 21, 21, 21, 22, 23, 23, 23, 24, 24, 25, 26, 26, 28, 29, 29, 29, 29, 29, 29, 30, 31, 32, 33, 33, 35, 35, 35, 38, 40, 41, 41, 41, 43, 43, 44, 44, 46, 47, 48, 48, 48, 48, 49, 49, 50, 51],
+  "2025-26": [0, 1, 1, 1, 1, 2, 3, 3, 3, 5, 6, 7, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 12, 13, 14, 15, 16, 16, 16, 18, 18, 20, 20, 20, 21, 23, 25, 28, 28, 30, 30, 32, 33, 35, 35, 38, 38, 38, 40, 40, 40, 41, 41, 43, 44, 44, 45, 46, 46, 47, 49, 52, 52, 53, 54, 55, 56, 57, 61, 63, 63, 63, 64, 66, 67, 67, 67, 69, 71, 72, 73, 73]
+};
+
+/* Instantané de la saison en cours (source : ESPN, 26 matchs, 14 pts,
+   jusqu'au 26 nov. 2026). Sert d'affichage de secours si l'API est
+   inaccessible ; remplacé dès qu'une mise à jour réussit. */
+const SNAPSHOT_CURRENT = (function(){
+  const perGame=[0,0,1,0,0,2,0,2,2,0,1,0,1,0,2,1,0,0,0,1,0,1,0,0,0,0];
+  let t=0;return perGame.map(p=>t+=p);
+})();
+
+const SEASONS = [
+  {label:"2024–2025", id:"2024-25", year:20242025, color:"#d49a24", current:false},
+  {label:"2025–2026", id:"2025-26", year:20252026, color:"#2864b4", current:false},
+  {label:"2026–2027", id:"2026-27", year:20262027, color:"#c62845", current:true}
+];
+
+/* ============================================================ */
+const NS="http://www.w3.org/2000/svg";
+const data={};      // id -> points cumulés par match
+const status={};    // id -> "live" | "cache" | "snapshot" | "hardcoded" | "fail"
+function node(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);parent.appendChild(n);return n}
+
+/* ---------- stockage local (protégé : peut être indisponible) ---------- */
+function cacheGet(id){try{const v=JSON.parse(localStorage.getItem("slaf:"+id));return Array.isArray(v&&v.pts)?v.pts:null}catch(_){return null}}
+function cacheSet(id,pts){try{localStorage.setItem("slaf:"+id,JSON.stringify({pts:pts,t:Date.now()}))}catch(_){}}
+
+/* ---------- réseau avec délai maximal (évite le blocage silencieux) ---------- */
+function fetchJson(url,ms){
+  const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+  return fetch(url,{signal:c.signal,cache:"no-store"})
+    .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
+    .finally(()=>clearTimeout(t));
+}
+function getJson(url){
+  const urls=[
+    url,
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(url),
+    "https://corsproxy.io/?"+encodeURIComponent(url)
+  ];
+  const tries=urls.map(u=>fetchJson(u,10000));
+  if(Promise.any)return Promise.any(tries);
+  return new Promise((ok,ko)=>{let n=0;tries.forEach(p=>p.then(ok,()=>{if(++n===tries.length)ko(new Error("Chargement impossible"))}))});
+}
+
+/* ---------- lecture du journal de matchs ---------- */
+async function loadSeason(s){
+  const j=await getJson(`https://api-web.nhle.com/v1/player/${PLAYER_ID}/game-log/${s.year}/2`);
+  const log=j.gameLog||j.games||j.data;
+  if(!Array.isArray(log))throw new Error("Format inattendu");
+  const date=g=>new Date(g.gameDate||g.gameDateUTC||g.game_date);
+  const games=[...log].sort((a,b)=>date(a)-date(b));
+  let total=0;
+  return games.map(g=>{
+    total+=Number(g.points ?? ((Number(g.goals)||0)+(Number(g.assists)||0)))||0;
+    return total;
+  });
+}
+
+/* ---------- dessin ---------- */
+function draw(){
+  const svg=document.getElementById("chart");svg.innerHTML="";
+  const W=960,H=500,L=68,R=44,T=24,B=58,pw=W-L-R,ph=H-T-B;
+  const all=[].concat(...Object.values(data));
+  const max=Math.max(10,...all);
+  const step=max<=50?5:10,ymax=Math.ceil(max/step)*step;
+  const x=n=>L+n/82*pw,y=n=>T+ph-n/ymax*ph;
+  for(let v=0;v<=ymax;v+=step){
+    const yy=y(v);node("line",{x1:L,y1:yy,x2:W-R,y2:yy,class:"gridline"},svg);
+    const t=node("text",{x:L-12,y:yy+4,"text-anchor":"end",class:"tick"},svg);t.textContent=v;
+  }
+  for(let v=0;v<=80;v+=10){
+    const xx=x(v);node("line",{x1:xx,y1:T,x2:xx,y2:T+ph,class:"gridline"},svg);
+    const t=node("text",{x:xx,y:H-B+22,"text-anchor":"middle",class:"tick"},svg);t.textContent=v;
+  }
+  node("line",{x1:L,y1:T+ph,x2:W-R,y2:T+ph,class:"axis"},svg);
+  node("line",{x1:L,y1:T,x2:L,y2:T+ph,class:"axis"},svg);
+  const xl=node("text",{x:L+pw/2,y:H-8,"text-anchor":"middle",class:"axislabel"},svg);xl.textContent="Numéro du match";
+  const yl=node("text",{x:16,y:T+ph/2,"text-anchor":"middle",class:"axislabel",transform:`rotate(-90 16 ${T+ph/2})`},svg);yl.textContent="Points";
+  SEASONS.forEach(s=>{
+    const d=data[s.id];if(!d||!d.length)return;
+    const pts=[0].concat(d);
+    const path=pts.map((p,i)=>(i?"L":"M")+x(i).toFixed(1)+","+y(p).toFixed(1)).join(" ");
+    node("path",{d:path,class:"curve",stroke:s.color},svg);
+    if(s.current){
+      const n=pts.length-1,cx=x(n),cy=y(pts[n]);
+      node("circle",{cx:cx,cy:cy,r:5.5,fill:s.color,stroke:"#fff","stroke-width":2},svg);
+      const t=node("text",{x:cx+9,y:cy+5,class:"endlabel",fill:s.color},svg);t.textContent=pts[n];
+    }
+  });
+}
+
+/* ---------- message d'état ---------- */
+function updateMessage(){
+  const el=document.getElementById("message");
+  const cur=SEASONS.find(s=>s.current),d=data[cur.id];
+  const parts=[];
+  if(d&&d.length)parts.push(`${cur.label} : ${d[d.length-1]} pts en ${d.length} match${d.length>1?"s":""}`);
+  const failed=SEASONS.filter(s=>status[s.id]==="fail");
+  const snap=status[cur.id]==="snapshot";
+  let warn="";
+  if(failed.length)warn=`Données indisponibles : ${failed.map(s=>s.label).join(", ")}. Vérifie ta connexion et recharge la page.`;
+  else if(snap)warn="Mise à jour en direct impossible : instantané du 26 nov. affiché.";
+  el.className=warn?"err":"";
+  el.textContent=[parts.join(""),warn].filter(Boolean).join(" — ")||"Chargement…";
+  const past=SEASONS.filter(s=>!s.current);
+  const btn=document.getElementById("exportBtn");
+  btn.hidden=!past.every(s=>data[s.id]&&data[s.id].length&&!HARDCODED[s.id]);
+}
+
+/* ---------- export (pour figer les saisons passées dans le fichier) ---------- */
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const out={};SEASONS.filter(s=>!s.current).forEach(s=>out[s.id]=data[s.id]);
+  const ta=document.getElementById("export");
+  ta.value=JSON.stringify(out);ta.style.display="block";ta.focus();ta.select();
+});
+
+/* ---------- démarrage : on dessine TOUT DE SUITE, puis on complète ---------- */
+(function(){
+  draw();updateMessage();
+  SEASONS.forEach(s=>{
+    // 1) codé en dur
+    if(!s.current&&Array.isArray(HARDCODED[s.id])){data[s.id]=HARDCODED[s.id];status[s.id]="hardcoded";return}
+    // 2) mémoire locale
+    const c=cacheGet(s.id);
+    if(c&&c.length){data[s.id]=c;status[s.id]="cache"}
+    else if(s.current){data[s.id]=SNAPSHOT_CURRENT;status[s.id]="snapshot"}
+    // saison passée déjà en mémoire : aucun besoin de réseau
+    if(!s.current&&status[s.id]==="cache")return;
+    // 3) réseau (saison en cours : toujours ; saison passée : une seule fois)
+    loadSeason(s).then(pts=>{
+      if(!pts.length&&s.current)return;       // saison pas commencée : on garde l'existant
+      data[s.id]=pts;status[s.id]="live";cacheSet(s.id,pts);
+    }).catch(()=>{
+      if(!data[s.id])status[s.id]="fail";
+    }).finally(()=>{draw();updateMessage()});
+  });
+  draw();updateMessage();
+})();
+</script>
+</body>
+</html>
