@@ -101,6 +101,13 @@ function getJson(url){
 
 /* ---------- lecture du journal de matchs ---------- */
 async function loadSeason(s){
+  // Saison en cours : d'abord current.json (même site, mis à jour par GitHub Actions)
+  if(s.current){
+    try{
+      const arr=await fetchJson("current.json?t="+Date.now(),8000);
+      if(Array.isArray(arr)&&arr.length){let t=0;return arr.map(p=>t+=Number(p)||0)}
+    }catch(_){}
+  }
   const j=await getJson(`https://api-web.nhle.com/v1/player/${PLAYER_ID}/game-log/${s.year}/2`);
   const log=j.gameLog||j.games||j.data;
   if(!Array.isArray(log))throw new Error("Format inattendu");
